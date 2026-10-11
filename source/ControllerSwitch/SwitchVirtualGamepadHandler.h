@@ -8,6 +8,7 @@ class SwitchVirtualGamepadHandlerData
 public:
     bool m_reattach_controller = false;
     bool m_is_connected = false;
+    ControllerType m_attach_type = ControllerType_Pro;
 };
 
 // This class is a base class for SwitchHDLHandler and SwitchAbstractedPaadHandler.
@@ -34,6 +35,8 @@ protected:
     virtual Result DetachController(uint16_t input_idx) = 0;
 
     void OnRun();
+
+    void BuildHdlsDeviceInfo(HiddbgHdlsDeviceInfo *deviceInfo, uint16_t input_idx);
 
 public:
     // thread_priority (0x00~0x3F); 0x2C is the usual priority of the main thread, 0x3B is a special priority on cores 0..2 that enables preemptive multithreading (0x3F on core 3).

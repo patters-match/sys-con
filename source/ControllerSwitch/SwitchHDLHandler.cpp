@@ -29,16 +29,6 @@ Result SwitchHDLHandler::Initialize()
 
         syscon::logger::LogDebug("SwitchHDLHandler[%04x-%04x] Initializing HDL device idx: %d (Controller type: %d) ...", m_controller->GetDevice()->GetVendor(), m_controller->GetDevice()->GetProduct(), i, m_controller->GetConfig().controllerType);
 
-        // Set the controller type to Pro-Controller, and set the npadInterfaceType.
-        m_hdlsData[i].m_deviceInfo.deviceType = ControllerTypeToDeviceType(m_controller->GetConfig().controllerType);
-        m_hdlsData[i].m_deviceInfo.npadInterfaceType = HidNpadInterfaceType_USB;
-
-        // Set the controller colors. The grip colors are for Pro-Controller on [9.0.0+].
-        m_hdlsData[i].m_deviceInfo.singleColorBody = __builtin_bswap32(m_controller->GetConfig().bodyColor.rgbaValue);
-        m_hdlsData[i].m_deviceInfo.singleColorButtons = __builtin_bswap32(m_controller->GetConfig().buttonsColor.rgbaValue);
-        m_hdlsData[i].m_deviceInfo.colorLeftGrip = __builtin_bswap32(m_controller->GetConfig().leftGripColor.rgbaValue);
-        m_hdlsData[i].m_deviceInfo.colorRightGrip = __builtin_bswap32(m_controller->GetConfig().rightGripColor.rgbaValue);
-
         m_hdlsData[i].m_hdlState.battery_level = 4; // Set battery charge to full.
         m_hdlsData[i].m_hdlState.analog_stick_l.x = 0;
         m_hdlsData[i].m_hdlState.analog_stick_l.y = 0;
@@ -68,6 +58,8 @@ Result SwitchHDLHandler::AttachController(uint16_t input_idx)
         return 0;
 
     syscon::logger::LogDebug("SwitchHDLHandler[%04x-%04x] Attaching device for input: %d ...", m_controller->GetDevice()->GetVendor(), m_controller->GetDevice()->GetProduct(), input_idx);
+
+    BuildHdlsDeviceInfo(&m_hdlsData[input_idx].m_deviceInfo, input_idx);
 
     Result rc = hiddbgAttachHdlsVirtualDevice(&m_hdlsData[input_idx].m_hdlHandle, &m_hdlsData[input_idx].m_deviceInfo);
     if (R_FAILED(rc))
